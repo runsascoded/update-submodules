@@ -1,0 +1,6 @@
+[submodule "test0"]
+	path = test0
+	url = git@github.com:runsascoded/git-update-submodules-test0.git
+[submodule "test1"]
+	path = test1
+	url = git@github.com:runsascoded/git-update-submodules-test1.git
