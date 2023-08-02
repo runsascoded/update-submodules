@@ -8,7 +8,7 @@ setup(
         'console_scripts': [
             'git-update-meta-branch=guss.git_update_meta_branch:main',
             'git-update-submodules=guss.git_update_meta_branch:main',
-            'github-update-submodules=guss.github_update_meta_branch:main',
+            'github-update-submodules=guss.github_update_submodules:main',
         ]
     }
 )
