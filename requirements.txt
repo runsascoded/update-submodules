@@ -1,3 +1,4 @@
 click
 GitPython
-utz>=0.3.27
+pygithub
+utz>=0.4.0

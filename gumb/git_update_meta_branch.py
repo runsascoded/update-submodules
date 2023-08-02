@@ -8,11 +8,12 @@ from git import Repo
 
 from utz import process, DefaultDict, err, parallel
 from utz.git import github
-from utz.git.git_update_submodules import update_submodules, verbose_flag, no_reset_flag
 from utz.git.remote import git_remote_sha
 
+from gumb.git_update_submodules import update_submodules, verbose_flag, no_reset_flag
 
-@click.command('git-meta-branch-update')
+
+@click.command('git-update-meta-branch')
 @click.option('-g/-G', '--github-step-summary/--no-github-step-summary', is_flag=True, default=None)
 @click.option('-P', '--no-push', is_flag=True, help='Skip pushing')
 @no_reset_flag
