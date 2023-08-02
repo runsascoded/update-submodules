@@ -6,7 +6,6 @@ on:
     inputs:
       ref:
         description: 'git-update-submodules ref to install'
-        required: true
       init:
         description: "Initial commit to initialize this test's branch to"
         default: 'b72d4de78127f569d106e665767298a5004baffa'
