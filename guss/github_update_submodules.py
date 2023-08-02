@@ -10,7 +10,7 @@ import click
 from github import Auth, Github
 from github.InputGitTreeElement import InputGitTreeElement
 from requests import patch
-from utz import DefaultDict, parallel, singleton
+from utz import DefaultDict, parallel, singleton, err
 from utz.git import github
 from utz.git.github import repository_option
 
@@ -68,7 +68,6 @@ def main(branch, message_files, github_step_summary, messages, num_jobs, reposit
     auth = Auth.Token(token=token)
     gh = Github(auth=auth)
     repo = gh.get_repo(repository)
-    name_with_owner = f'{repo.owner.login}/{repo.name}'
     commit = repo.get_commit(branch or 'HEAD')
     tree = commit.commit.tree
     submodules = {
@@ -143,13 +142,19 @@ def main(branch, message_files, github_step_summary, messages, num_jobs, reposit
             messages = [ default_msg ]
 
         message = '\n\n'.join(messages)
+        err('Preparing commit:\n\n' + message + '\n')
         new_tree = repo.create_git_tree(new_elems, base_tree=tree)
+        err(f'New tree: {new_tree.sha}')
         new_commit = repo.create_git_commit(message=message, tree=new_tree, parents=[commit.commit])
-        new_commit_sha = new_commit.sha
-        repo_base_url = f'https://github.com/repos/{name_with_owner}'
-        branch_update_url = f'{repo_base_url}/git/refs/heads/{branch}'
-        response = patch(branch_update_url, json={'sha': new_commit.sha})
+        err(f'New commit: {new_commit.sha}')
+        branch_update_url = f'https://api.github.com/repos/{repository}/git/refs/heads/{branch}'
+        response = patch(
+            branch_update_url,
+            json={'sha': new_commit.sha},
+            headers=dict(Authorization=f'Bearer {token}'),
+        )
         response.raise_for_status()
+        err(f'Updated branch {branch} to {new_commit.sha}')
 
         if github_step_summary is None:
             github_step_summary = environ.get(GITHUB_STEP_SUMMARY)
@@ -157,7 +162,7 @@ def main(branch, message_files, github_step_summary, messages, num_jobs, reposit
         if github_step_summary:
             bullet_strs = []
             for path, submodule in update_submodules.items():
-                submodule_name_with_owner = submodule['nwo']
+                submodule_name_with_owner = submodule['name_with_owner']
                 cur_sha = submodule["sha"][:SHORT_SHA_LEN]
                 new_sha = submodule["new_sha"][:SHORT_SHA_LEN]
                 submodule_base_url = f'https://github.com/{submodule_name_with_owner}'
@@ -165,7 +170,7 @@ def main(branch, message_files, github_step_summary, messages, num_jobs, reposit
                 bullet_strs.append(bullet_str)
 
             bullets_str = "\n".join(bullet_strs)
-            md = f'''Pushed submodule update ([`{new_commit_sha[:SHORT_SHA_LEN]}`]({repo_base_url}/commit/{new_commit_sha})):
+            md = f'''Pushed submodule update ([`{new_commit.sha[:SHORT_SHA_LEN]}`](https://github.com/repos/{repository}/commit/{new_commit.sha})):
 
 {bullets_str}
 '''
