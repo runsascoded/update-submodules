@@ -164,6 +164,7 @@ def main(branch, message_files, github_step_summary, messages, num_jobs, reposit
             github_step_summary = environ.get(GITHUB_STEP_SUMMARY)
 
         if github_step_summary:
+            subject = f'Pushed submodule update ([`{new_commit.sha[:SHORT_SHA_LEN]}`](https://github.com/{repository}/commit/{new_commit.sha}))'
             bullet_strs = []
             for path, submodule in update_submodules.items():
                 submodule_name_with_owner = submodule['name_with_owner']
@@ -174,10 +175,7 @@ def main(branch, message_files, github_step_summary, messages, num_jobs, reposit
                 bullet_strs.append(bullet_str)
 
             bullets_str = "\n".join(bullet_strs)
-            md = f'''Pushed submodule update ([`{new_commit.sha[:SHORT_SHA_LEN]}`](https://github.com/repos/{repository}/commit/{new_commit.sha})):
-
-{bullets_str}
-'''
+            md = f'{subject}:\n\n{bullets_str}'
             if github_step_summary == '-':
                 print(md)
             else:
