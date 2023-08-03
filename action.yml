@@ -1,0 +1,25 @@
+name: git-update-submodules
+description: Update submodules (remotely, using the Github API, without cloning anything)
+inputs:
+  repository:
+    description: The name of the repository to update
+    default: ${{ github.repository }}
+  branch:
+    description: The name of the branch to update
+    default: ${{ github.event.pull_request && github.head_ref || github.ref_name }}
+  refs:
+    description: "One or more <submodule>=<ref> arguments indicating which ref to update each submodule to. An argument like <ref> (with no \"=\") sets a default for all submodules, otherwise each submodule's remote HEAD will be used."
+  token:
+    description: GitHub token with push access to the repo
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Install git-update-submodules
+      run: pip install git+https://github.com/runsascoded/git-update-submodules
+      shell: bash
+    - name: Update submodules
+      run: github-update-submodules -R${{ inputs.repository }} -b${{ inputs.branch }} ${{ inputs.refs }}
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
