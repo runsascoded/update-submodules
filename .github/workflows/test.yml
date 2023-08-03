@@ -20,13 +20,13 @@ jobs:
         run: |
           echo "REF=${{ inputs.ref || (github.event.pull_request && github.head_ref || github.ref_name) }}" >> $GITHUB_ENV
           echo "branch=test-${{ github.run_id }}" >> $GITHUB_ENV
-      - name: Install git-update-submodules
-        run: pip install git+https://github.com/$GITHUB_REPOSITORY@$REF
       - name: Initialize test branch
         uses: runsascoded/tmp-branch-action@main
         with:
           branch: ${{ env.branch }}
           sha: ${{ inputs.init || 'b72d4de78127f569d106e665767298a5004baffa' }}
+      - name: Install git-update-submodules
+        run: pip install git+https://github.com/$GITHUB_REPOSITORY@$REF
       - name: Update submodules
         run: github-update-submodules -b$branch
       - name: Verify submodule updates
