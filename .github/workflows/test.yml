@@ -27,7 +27,7 @@ jobs:
         uses: runsascoded/tmp-branch-action@main
         with:
           branch: ${{ env.branch }}
-          sha: ${{ inputs.init }}
+          sha: ${{ inputs.init || 'b72d4de78127f569d106e665767298a5004baffa' }}
       - name: Update submodules
         run: github-update-submodules -b$branch
       - name: Verify submodule updates

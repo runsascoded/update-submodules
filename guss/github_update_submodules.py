@@ -11,6 +11,7 @@ from github import Auth, Github
 from github.InputGitTreeElement import InputGitTreeElement
 from requests import patch
 from utz import DefaultDict, parallel, singleton, err
+from utz.collections import Expected1Found0
 from utz.git import github
 from utz.git.github import repository_option
 
@@ -70,13 +71,16 @@ def main(branch, message_files, github_step_summary, messages, num_jobs, reposit
     repo = gh.get_repo(repository)
     commit = repo.get_commit(branch or 'HEAD')
     tree = commit.commit.tree
+    elems = tree.tree
     submodules = {
         elem.path: { 'path': elem.path, 'sha': elem.sha }
-        for elem in tree.tree
+        for elem in elems
         if elem.type == 'commit'
     }
-
-    gitmodules_elem = singleton([ e for e in tree.tree if e.path == '.gitmodules' ], dedupe=False)
+    try:
+        gitmodules_elem = singleton([ e for e in elems if e.path == '.gitmodules' ], dedupe=False)
+    except Expected1Found0:
+        raise RuntimeError(f"Tree {tree} does not contain a .gitmodules file, {repo=}, {branch=}, tree={tree.sha}, tree elems {elems}")
     gitmodules_sha = gitmodules_elem.sha
     gitmodules_blob = repo.get_git_blob(gitmodules_sha)
     if gitmodules_blob.encoding != 'base64':
