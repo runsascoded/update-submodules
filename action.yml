@@ -12,6 +12,10 @@ inputs:
   token:
     description: GitHub token with push access to the repo
     required: true
+outputs:
+  commit:
+    description: The SHA of the newly-created commit
+    value: ${{ steps.update.outputs.commit }}
 runs:
   using: "composite"
   steps:
@@ -19,6 +23,7 @@ runs:
       run: pip install git+https://github.com/runsascoded/git-update-submodules
       shell: bash
     - name: Update submodules
+      id: update
       run: github-update-submodules -R${{ inputs.repository }} -b${{ inputs.branch }} ${{ inputs.refs }}
       shell: bash
       env:

@@ -15,6 +15,7 @@ from utz.collections import Expected1Found0
 from utz.git import github
 from utz.git.github import repository_option
 
+GITHUB_OUTPUT = 'GITHUB_OUTPUT'
 GITHUB_STEP_SUMMARY = 'GITHUB_STEP_SUMMARY'
 SHORT_SHA_LEN = 7
 
@@ -53,11 +54,12 @@ def branch_option(*flag_args, **flag_kwargs):
 @branch_option(help='Branch to update')
 @click.option('-F', 'message_files', multiple=True, help="Files containing commit log message paragraphs, use \"-\" to read from the standard input. Can be passed more than once.")
 @click.option('-g', '--github-step-summary', help=f'Write a summary of the new commit to this path (defaults to ${GITHUB_STEP_SUMMARY}, "-" for stdout, "" to disable)')
-@click.option('-m', '--message', 'messages', multiple=True, help="Message paragraphs in the commit log message, can be passed more than once.")
 @click.option('-j', '--num-jobs', type=int, default=0, help='Max number of parallel jobs while fetching current submodule SHAs (default 0 = cpu_count())')
+@click.option('-m', '--message', 'messages', multiple=True, help="Message paragraphs in the commit log message, can be passed more than once.")
+@click.option('-o', '--github-output', help=f'Write the newly-created commit\'s SHA to this path (defaults to ${GITHUB_OUTPUT}, "-" for stdout, "" to disable)')
 @repository_option()
 @refs_args
-def main(branch, message_files, github_step_summary, messages, num_jobs, repository, refs):
+def main(branch, message_files, github_step_summary, num_jobs, messages, github_output, repository, refs):
     token = environ.get('GITHUB_TOKEN', environ.get('GH_TOKEN'))
     if not token:
         token_path = '.github-token'
@@ -159,6 +161,17 @@ def main(branch, message_files, github_step_summary, messages, num_jobs, reposit
         )
         response.raise_for_status()
         err(f'Updated branch {branch} to {new_commit.sha}')
+
+        if github_output is None:
+            github_output = environ.get(GITHUB_OUTPUT)
+
+        if github_output:
+            output = f'commit={new_commit.sha}'
+            if github_output == '-':
+                print(output)
+            else:
+                with open(github_output, 'w') as f:
+                    f.write(output + '\n')
 
         if github_step_summary is None:
             github_step_summary = environ.get(GITHUB_STEP_SUMMARY)

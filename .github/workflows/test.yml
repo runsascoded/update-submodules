@@ -28,7 +28,10 @@ jobs:
       - name: Install git-update-submodules
         run: pip install git+https://github.com/$GITHUB_REPOSITORY@$REF
       - name: Update submodules
+        id: update
         run: github-update-submodules -b$branch
+      - run: |
+          echo "steps.update.outputs.commit: ${{ steps.update.outputs.commit }}"
       - name: Verify submodule updates
         run: |
           echo "Branch $branch"
