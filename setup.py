@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="update-submodules",
-    version="0.0.1",
+    version="0.0.2",
     install_requires=open("requirements.txt").read(),
     packages=find_packages(),
     entry_points={
