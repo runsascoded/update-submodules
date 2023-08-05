@@ -18,7 +18,9 @@ jobs:
     steps:
       - name: Set env vars
         run: |
+          # Store the triggering branch (cf. https://github.com/github/docs/issues/15319#issuecomment-1662257301)
           echo "REF=${{ inputs.ref || (github.event.pull_request && github.head_ref || github.ref_name) }}" >> $GITHUB_ENV
+          # Store a temporary branch name in `$branch`
           echo "branch=test-${{ github.run_id }}" >> $GITHUB_ENV
       - name: Initialize test branch
         uses: runsascoded/tmp-branch-action@main

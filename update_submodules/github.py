@@ -30,12 +30,16 @@ def refs_args(fn):
     return _fn
 
 
-def branch_option(*flag_args, **flag_kwargs):
+def branch_option(
+        *flag_args,
+        help="Branch to update, defaults to `[ $GITHUB_EVENT_NAME == pull_request ] && $GITHUG_HEAD_REF || $GIRHUB_REF_NAME`",
+        **flag_kwargs
+):
     if not flag_args:
         flag_args = ('-b', '--branch')
 
     def option(fn):
-        @click.option(*flag_args, **flag_kwargs)
+        @click.option(*flag_args, help=help, **flag_kwargs)
         @wraps(fn)
         def _fn(*args, branch, **kwargs):
             if not branch:
@@ -50,16 +54,20 @@ def branch_option(*flag_args, **flag_kwargs):
     return option
 
 
-@click.command('github-update-meta-branch')
-@branch_option(help='Branch to update')
+@click.command('github-update-submodules')
+@branch_option()
 @click.option('-F', 'message_files', multiple=True, help="Files containing commit log message paragraphs, use \"-\" to read from the standard input. Can be passed more than once.")
 @click.option('-g', '--github-step-summary', help=f'Write a summary of the new commit to this path (defaults to ${GITHUB_STEP_SUMMARY}, "-" for stdout, "" to disable)')
-@click.option('-j', '--num-jobs', type=int, default=0, help='Max number of parallel jobs while fetching current submodule SHAs (default 0 = cpu_count())')
+@click.option('-j', '--num-jobs', type=int, default=0, help='Max number of parallel jobs while fetching current submodule SHAs (default: 0 ⟹ cpu_count())')
 @click.option('-m', '--message', 'messages', multiple=True, help="Message paragraphs in the commit log message, can be passed more than once.")
 @click.option('-o', '--github-output', help=f'Write the newly-created commit\'s SHA to this path (defaults to ${GITHUB_OUTPUT}, "-" for stdout, "" to disable)')
 @repository_option()
 @refs_args
 def main(branch, message_files, github_step_summary, num_jobs, messages, github_output, repository, refs):
+    """Update submodules in a GitHub repository, using the API / without cloning the repository.
+
+    Positional <ref_str> arguments can be of the form `<submodule>=<ref>` or just `<ref>` (to set a fallback for all submodules).
+    """
     token = environ.get('GITHUB_TOKEN', environ.get('GH_TOKEN'))
     if not token:
         token_path = '.github-token'

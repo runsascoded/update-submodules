@@ -1,15 +1,15 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="guss",
+    name="update-submodules",
     version="0.0.1",
     install_requires=open("requirements.txt").read(),
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'git-update-meta-branch=guss.git_update_meta_branch:main',
-            'git-update-submodules=guss.git_update_meta_branch:main',
-            'github-update-submodules=guss.github_update_submodules:main',
+            'git-update-meta-branch=update_submodules.meta_branch:main',
+            'git-update-submodules=update_submodules.git:main',
+            'github-update-submodules=update_submodules.github:main',
         ]
     }
 )

@@ -10,7 +10,7 @@ from utz import process, DefaultDict, err, parallel
 from utz.git import github
 from utz.git.remote import git_remote_sha
 
-from guss.git_update_submodules import update_submodules, verbose_flag, no_reset_flag
+from update_submodules.git import update_submodules, verbose_flag, no_reset_flag
 
 
 @click.command('git-update-meta-branch')

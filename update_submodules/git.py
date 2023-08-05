@@ -62,6 +62,10 @@ verbose_flag = click.option('-v', '--verbose', count=True, help='1x: print tree,
 @verbose_flag
 @click.argument('ref_strs', nargs=-1)
 def main(ref_strs, verbose, **kwargs):
+    """Update submodules in a locally-cloned Git repository.
+
+    Positional <ref_str> arguments can be of the form `<submodule>=<ref>` or just `<ref>` (to set a fallback for all submodules).
+    """
     _, refs = DefaultDict.parse_configs(ref_strs)
     if not refs:
         if verbose:
