@@ -26,7 +26,7 @@ jobs:
           # Store a temporary branch name in `$branch`
           echo "branch=test-${{ github.run_id }}" >> $GITHUB_ENV
       - name: Initialize test branch
-        uses: runsascoded/tmp-branch-action@main
+        uses: runsascoded/tmp-branch-action@v1
         with:
           branch: ${{ env.branch }}
           sha: ${{ env.init }}

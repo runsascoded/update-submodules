@@ -1,5 +1,8 @@
 # update-submodules
  Update a repo's submodules without cloning it (using the GitHub API)
+
+[![PyPI badge: "update-submodules" library](https://img.shields.io/pypi/v/update-submodules.svg)](https://pypi.python.org/pypi/update-submodules)
+
  - [Python library](#python-library)
  - [GitHub Action](#github-action)
 
@@ -122,12 +125,11 @@ or:
 ## Similar Projects / Links
 I looked at the following libraries and examples, but they mostly require cloning the repo, which I wanted to avoid:
 
-- https://github.blog/2020-12-21-get-up-to-speed-with-partial-clone-and-shallow-clone/
-- https://github.com/robherley/shallow-fetch-sha
-- https://github.com/marketplace/actions/github-action-submodule-updates
 - https://thenewstack.io/how-to-trigger-github-actions-on-submodule-updates/
 - https://stackoverflow.com/questions/64407333/using-github-actions-to-automatically-update-the-repos-submodules
 - https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#package-ecosystem
+- https://github.blog/2020-12-21-get-up-to-speed-with-partial-clone-and-shallow-clone/
+- https://github.com/robherley/shallow-fetch-sha
 
 ### Github Actions
 - https://github.com/marketplace/actions/submodule-branch-check
