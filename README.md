@@ -115,8 +115,8 @@ steps:
 ```
 
 The Action also prints a summary on the workflow "summary" page, like:
-[![](screenshots/rc.png)](https://github.com/runsascoded/.rc/actions/runs/5755454755)
-([from runsascoded/.rc](https://github.com/runsascoded/.rc/blob/server/.github/workflows/update-branches.yml))
+[![](screenshots/rc.png)](https://github.com/runsascoded/.rc/actions/runs/5771027368)
+([from runsascoded/.rc](https://github.com/runsascoded/.rc/blob/server/.github/workflows/update-branches.yml#L10-L15))
 
 or:
 [![](screenshots/test.png)](https://github.com/runsascoded/update-submodules/actions/runs/5757404520)
