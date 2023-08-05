@@ -30,7 +30,7 @@ jobs:
         with:
           branch: ${{ env.branch }}
           sha: ${{ env.init }}
-      - name: Install git-update-submodules
+      - name: Install update-submodules
         run: pip install git+https://github.com/$GITHUB_REPOSITORY@$REF
       - name: Update submodules
         id: update
