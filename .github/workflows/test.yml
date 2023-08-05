@@ -1,11 +1,12 @@
-name: Test git-update-submodules
+name: Test github-update-submodules CLI, release update-submodules to PyPI
 on:
   push:
     branches: [ main, test ]
+    tags: [ v* ]
   workflow_dispatch:
     inputs:
       ref:
-        description: 'git-update-submodules ref to install'
+        description: 'runsascoded/update-submodules repo ref to install'
       init:
         description: "Initial commit SHA to initialize this test's branch to"
         default: 'b72d4de78127f569d106e665767298a5004baffa'
@@ -13,7 +14,7 @@ env:
   GH_TOKEN: ${{ github.token }}
 jobs:
   test:
-    name: Test git-update-submodules
+    name: Test github-update-submodules
     runs-on: ubuntu-latest
     steps:
       - name: Set env vars
@@ -44,3 +45,22 @@ jobs:
           elems="$(gh api /repos/$GITHUB_REPOSITORY/git/trees/$tree | jq -c '.tree | map({ "key": .path, "value": .sha }) | from_entries')"
           echo "elems: $elems"
           [ "$elems" == '{".gitmodules":"7816159e836aec22afcbcb75f56f706883890054","test0":"f398921287dae85b39c97f5273f8a8a9ebdc76d7","test1":"65d3b0bef66bfb952f14c70e22cbe78aa9613e97"}' ] && echo 'Success!'
+  release:
+    name: Release `update-submodules` to PyPI
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v4
+        - uses: actions/setup-python@v3
+          with:
+            python-version: '3.9'
+        - run: pip install -e .
+        - name: Build, release
+          env:
+            TWINE_USERNAME: __token__
+            TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+          run: |
+            pip install setuptools twine wheel
+            python setup.py sdist bdist_wheel
+            twine upload dist/*
