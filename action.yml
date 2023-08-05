@@ -1,5 +1,8 @@
-name: git-update-submodules
+name: update-submodules
 description: Update submodules (remotely, using the Github API, without cloning anything)
+branding:
+  color: "purple"
+  icon: "git-commit"
 inputs:
   repository:
     description: The name of the repository to update
