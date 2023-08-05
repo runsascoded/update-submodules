@@ -1,16 +1,20 @@
 # update-submodules
- Update a repo's submodules without cloning it (using the GitHub API)
+Update a repo's submodules without cloning it (using the GitHub API)
 
-[![PyPI badge: "update-submodules" library](https://img.shields.io/pypi/v/update-submodules.svg)](https://pypi.python.org/pypi/update-submodules)
+ - [Python library](#python-library): `update-submodules` [![PyPI badge: "update-submodules" library](https://img.shields.io/pypi/v/update-submodules.svg)](https://pypi.python.org/pypi/update-submodules)
+     - [Update submodules directly via the GitHub API](#github-update-modules)
+     - [Update submodules in cloned repositories (including "bare" clones)](#git-update-submodules)
+ - [GitHub Action: `runsascoded/update-submodules@v1`](#github-action)
+     - [Default branches](#default-branches)
+     - [Overriding branches/refs](#non-default-branches)
+     - [Step output: new commit SHA](#output)
+     - [Step summary](#step-summary)
 
- - [Python library](#python-library)
- - [GitHub Action](#github-action)
-
-## Python Library <a id="python-library"></a>
+## Python Library: `update-submodules` <a id="python-library"></a>
 ```bash
 pip install update-submodules
 ```
-### Update submodules directly via the GitHub API
+### Update submodules directly via the GitHub API <a id="github-update-modules"></a>
 ```bash
 github-update-submodules --help
 # Usage: github-update-submodules [OPTIONS] [REF_STRS]...
@@ -47,7 +51,7 @@ github-update-submodules --help
 #   --help                          Show this message and exit.
 ```
 
-### Update submodules in cloned repositories (including "bare" clones)
+### Update submodules in cloned repositories (including "bare" clones) <a id="git-update-submodules"></a>
 If your repository is already cloned (including "bare" clones), `git-update-submodules` works similarly (including `push`ing):
 ```bash
 git-update-submodules --help
@@ -82,28 +86,32 @@ git-update-submodules --help
 ```
 This also works on repos hosted outside GitHub.
 
-## GitHub Action <a id="github-action"></a>
-Example usage:
+## GitHub Action: `runsascoded/update-submodules@v1` <a id="github-action"></a>
+`github-update-submodules` is also available as a GitHub Action (see [`action.yml`](action.yml)).
+
+### Default branches <a id="default-branches"></a>
+Update all submodules in current `$GITHUB_REPOSITORY`'s default branch to point to the latest SHA's on their respective default branches:
 ```yaml
 steps:
-  # Update the current $GITHUB_REPOSITORY's default branch to contain the latest SHA on each submodule's default branch
   - uses: runsascoded/update-submodules@v1
     with:
       token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-Specific refs can be provided per-submodule, and non-default branches can be updated:
+### Overriding branches/refs <a id="non-default-branches"></a>
+The parent-repo branch to update is configurable, as are the specific refs to update each submodule to:
 ```yaml
 steps:
   - uses: runsascoded/update-submodules@v1
     with:
-      # Specific branch/tag for 2 submodules, `develop` branch for others
-      refs: submodule1=main submodule2:refs/tags/v1.0.0 develop
-      # Update a non-HEAD branch
+      # Update a non-default branch
       branch: develop
+      # Specific branch/tag for 2 submodules, fall back to the `develop` branch for all others
+      refs: submodule1=main submodule2:refs/tags/v1.0.0 develop
       token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
+### Step output: new commit SHA <a id="output"></a>
 If the action creates a commit (containing newly-updated submodules), the commit's SHA is stored as an "output":
 ```yaml
 steps:
@@ -113,6 +121,8 @@ steps:
       token: ${{ secrets.GITHUB_TOKEN }}
   - run: echo "Pushed new commit ${{ steps.update.outputs.sha }} with updated submodules"
 ```
+
+### Step summary <a id="step-summary"></a>
 
 The Action also prints a summary on the workflow "summary" page, like:
 [![](screenshots/rc.png)](https://github.com/runsascoded/.rc/actions/runs/5771027368)
