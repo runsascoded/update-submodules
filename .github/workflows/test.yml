@@ -16,6 +16,8 @@ jobs:
   test:
     name: Test github-update-submodules
     runs-on: ubuntu-latest
+    env:
+      init: ${{ inputs.init || 'b72d4de78127f569d106e665767298a5004baffa' }}
     steps:
       - name: Set env vars
         run: |
@@ -27,14 +29,34 @@ jobs:
         uses: runsascoded/tmp-branch-action@main
         with:
           branch: ${{ env.branch }}
-          sha: ${{ inputs.init || 'b72d4de78127f569d106e665767298a5004baffa' }}
+          sha: ${{ env.init }}
       - name: Install git-update-submodules
         run: pip install git+https://github.com/$GITHUB_REPOSITORY@$REF
       - name: Update submodules
         id: update
         run: github-update-submodules -b$branch
-      - run: |
-          echo "steps.update.outputs.commit: ${{ steps.update.outputs.commit }}"
+      - run: "echo \"steps.update.outputs.commit: ${{ steps.update.outputs.commit }}\""
+      - name: Wait for `gh api` to reflect new commit on branch
+        run: |
+          i=0
+          n=5
+          while [ 1 ]; do
+            commit="$(gh api /repos/$GITHUB_REPOSITORY/git/ref/heads/$branch | jq -r .object.sha)"
+            if [ $commit != $init ] || [ $i -ge $n ]; then break; fi
+            echo "$i/$n: waiting for branch $branch to show a commit other than $init (expected ${{ steps.update.outputs.commit }})…"
+            sleep 1
+            let i=$i+1
+          done
+          if [ $i -ge $n ]; then
+            msg=Branch $branch still shows commit $init after $n seconds
+            echo "::error::$msg"
+            echo "$msg"
+            exit 1
+          elif [ $i -gt 0 ]; then
+            msg="Branch $branch took $n seconds to update from initial value $init"
+            echo "::warning::$msg"
+            echo "$msg"
+          fi
       - name: Verify submodule updates
         run: |
           echo "Branch $branch"
@@ -43,16 +65,18 @@ jobs:
           tree="$(gh api /repos/$GITHUB_REPOSITORY/git/commits/$commit | jq -r .tree.sha)"
           echo "tree: $tree"
           elems="$(gh api /repos/$GITHUB_REPOSITORY/git/trees/$tree | jq -c '.tree | map({ "key": .path, "value": .sha }) | from_entries')"
-          echo "elems: $elems"
-          [ "$elems" == '{".gitmodules":"7816159e836aec22afcbcb75f56f706883890054","test0":"f398921287dae85b39c97f5273f8a8a9ebdc76d7","test1":"65d3b0bef66bfb952f14c70e22cbe78aa9613e97"}' ] && echo 'Success!'
+          expected='{".gitmodules":"7816159e836aec22afcbcb75f56f706883890054","test0":"f398921287dae85b39c97f5273f8a8a9ebdc76d7","test1":"65d3b0bef66bfb952f14c70e22cbe78aa9613e97"}'
+          echo "elems:    $elems"
+          echo "expected: $expected"
+          [ "$elems" == "$expected" ] && echo 'Success!'
   release:
     name: Release `update-submodules` to PyPI
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs: test
     runs-on: ubuntu-latest
     steps:
-        - uses: actions/checkout@v4
-        - uses: actions/setup-python@v3
+        - uses: actions/checkout@v3
+        - uses: actions/setup-python@v4
           with:
             python-version: '3.9'
         - run: pip install -e .
