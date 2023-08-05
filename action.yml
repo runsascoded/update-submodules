@@ -12,6 +12,8 @@ inputs:
   token:
     description: GitHub token with push access to the repo
     required: true
+  version:
+    description: "Version of the `update-submodules` PyPI library to use"
 outputs:
   commit:
     description: The SHA of the newly-created commit
@@ -20,7 +22,7 @@ runs:
   using: "composite"
   steps:
     - name: Install git-update-submodules
-      run: pip install git+https://github.com/runsascoded/git-update-submodules
+      run: pip install update-submodules${{ inputs.version && format('=={0}', inputs.version) }}
       shell: bash
     - name: Update submodules
       id: update
