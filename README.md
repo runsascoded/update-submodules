@@ -1,16 +1,19 @@
 # update-submodules
 Update a repo's submodules without cloning it (using the GitHub API)
 
- - [Python library](#python-library): `update-submodules` [![PyPI badge: "update-submodules" library](https://img.shields.io/pypi/v/update-submodules.svg)](https://pypi.python.org/pypi/update-submodules)
-     - [Update submodules directly via the GitHub API](#github-update-modules)
-     - [Update submodules in cloned repositories (including "bare" clones)](#git-update-submodules)
- - [GitHub Action: `runsascoded/update-submodules@v1`](#github-action)
-     - [Default branches](#default-branches)
-     - [Overriding branches/refs](#non-default-branches)
-     - [Step output: new commit SHA](#output)
-     - [Step summary](#step-summary)
+<!-- toc -->
+- [Python Library: `update-submodules`](#python-library)
+    - [Update submodules directly via the GitHub API](#github-update-modules)
+    - [Update submodules in cloned repositories (including "bare" clones)](#git-update-submodules)
+- [GitHub Action: `runsascoded/update-submodules@v1`](#github-action)
+    - [Default branches](#default-branches)
+    - [Overriding branches/refs](#non-default-branches)
+    - [Step output: new commit SHA](#output)
+    - [Step summary](#step-summary)
+<!-- /toc -->
 
 ## Python Library: `update-submodules` <a id="python-library"></a>
+[![PyPI badge: "update-submodules" library](https://img.shields.io/pypi/v/update-submodules.svg)](https://pypi.python.org/pypi/update-submodules)
 ```bash
 pip install update-submodules
 ```
@@ -87,7 +90,7 @@ git-update-submodules --help
 This also works on repos hosted outside GitHub.
 
 ## GitHub Action: `runsascoded/update-submodules@v1` <a id="github-action"></a>
-`github-update-submodules` is also available as a GitHub Action (see [`action.yml`](action.yml)).
+`github-update-submodules` is also [available as a GitHub Action](https://github.com/marketplace/actions/update-submodules) (see [`action.yml`](action.yml)).
 
 ### Default branches <a id="default-branches"></a>
 Update all submodules in current `$GITHUB_REPOSITORY`'s default branch to point to the latest SHA's on their respective default branches:
